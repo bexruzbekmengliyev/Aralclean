@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AralClean - Orol Dengizini Saqlash Tizimi</title>
+    <link rel="stylesheet" href="style_uz.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-water"></i>
+                <span>Aral<span class="highlight">Clean</span></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#dashboard" class="nav-link">Boshqaruv</a></li>
+                <li><a href="#monitoring" class="nav-link">Monitoring</a></li>
+                <li><a href="#rivers" class="nav-link">Daryolar</a></li>
+                <li><a href="#salinity" class="nav-link">Tuzlilik</a></li>
+                <li><a href="#map" class="nav-link">Xarita</a></li>
+            </ul>
+            <div class="language-switcher">
+                <a href="index_uz.html" class="active">UZ</a>
+                <a href="index_ru.html">RU</a>
+                <a href="index_en.html">EN</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Orol Dengizini Saqlash va Tiklash</h1>
+            <p>Qoraqalpog'iston Respublikasi - Mo'ynoq Tumani</p>
+            <div class="hero-location">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>GPS: 43.75°N, 59.00°E</span>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-card urgent">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="stat-info">
+                        <h3 id="currentSalinity">0</h3>
+                        <p>Hozirgi Tuzlilik (ppt)</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-tint"></i>
+                    <div class="stat-info">
+                        <h3 id="amuDaily">0</h3>
+                        <p>Amudaryo Kunlik Oqim (m³/s)</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-water"></i>
+                    <div class="stat-info">
+                        <h3 id="syrDaily">0</h3>
+                        <p>Sirdaryo Kunlik Oqim (m³/s)</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-chart-line"></i>
+                    <div class="stat-info">
+                        <h3 id="saltIncrease">0</h3>
+                        <p>Kunlik Tuz Ortishi (ppt)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Real-time Monitoring -->
+    <section id="monitoring" class="monitoring-section">
+        <div class="container">
+            <h2 class="section-title">Real Vaqt Monitoring</h2>
+            
+            <div class="monitoring-grid">
+                <!-- Salinity Monitor -->
+                <div class="monitor-card salinity-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-flask"></i> Tuzlilik Darajasi</h3>
+                        <span class="badge critical">Yuqori</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="gauge-container">
+                            <div class="gauge">
+                                <div class="gauge-fill" id="salinityGauge" style="--percentage: 85"></div>
+                            </div>
+                            <div class="gauge-value">
+                                <span id="salinityValue">95</span>
+                                <small>ppt</small>
+                            </div>
+                        </div>
+                        <div class="salinity-info">
+                            <div class="info-row">
+                                <span>Okean suvi:</span>
+                                <strong>35 ppt</strong>
+                            </div>
+                            <div class="info-row">
+                                <span>Orol (1960):</span>
+                                <strong>10 ppt</strong>
+                            </div>
+                            <div class="info-row current">
+                                <span>Hozirgi:</span>
+                                <strong id="currentSal">95 ppt</strong>
+                            </div>
+                            <div class="info-row increase">
+                                <span>Kunlik o'sish:</span>
+                                <strong id="dailyIncrease">+0.18 ppt</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Water Level -->
+                <div class="monitor-card water-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-ruler-vertical"></i> Suv Sathi</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="water-level">
+                            <div class="level-indicator">
+                                <div class="level-fill" id="waterLevelFill" style="height: 25%"></div>
+                            </div>
+                            <div class="level-markers">
+                                <div class="marker" style="top: 10%">53m (1960)</div>
+                                <div class="marker" style="top: 50%">42m (1990)</div>
+                                <div class="marker current" style="top: 85%">38m (2026)</div>
+                            </div>
+                        </div>
+                        <div class="level-stats">
+                            <div class="stat">
+                                <span>1960:</span>
+                                <strong>53m</strong>
+                            </div>
+                            <div class="stat">
+                                <span>2026:</span>
+                                <strong>38m</strong>
+                            </div>
+                            <div class="stat decrease">
+                                <span>Pasayish:</span>
+                                <strong>-15m</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Area Shrinkage -->
+                <div class="monitor-card area-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-compress-arrows-alt"></i> Maydon Qisqarishi</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="area-comparison">
+                            <div class="area-item original">
+                                <div class="area-bar" style="width: 100%"></div>
+                                <span>68,000 km² (1960)</span>
+                            </div>
+                            <div class="area-item current">
+                                <div class="area-bar" style="width: 12%"></div>
+                                <span>8,000 km² (2026)</span>
+                            </div>
+                        </div>
+                        <div class="shrinkage-stats">
+                            <div class="shrink-item">
+                                <i class="fas fa-percentage"></i>
+                                <div>
+                                    <strong>88%</strong>
+                                    <span>Maydon yo'qolgan</span>
+                                </div>
+                            </div>
+                            <div class="shrink-item">
+                                <i class="fas fa-calendar-minus"></i>
+                                <div>
+                                    <strong>66 yil</strong>
+                                    <span>1960-2026</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rivers Section -->
+    <section id="rivers" class="rivers-section">
+        <div class="container">
+            <h2 class="section-title">Amudaryo va Sirdaryo Suv Oqimi</h2>
+            
+            <div class="rivers-grid">
+                <!-- Amu Darya -->
+                <div class="river-card amu-darya">
+                    <div class="river-header">
+                        <i class="fas fa-water"></i>
+                        <h3>Amudaryo</h3>
+                    </div>
+                    <div class="river-content">
+                        <div class="flow-indicator">
+                            <div class="flow-bar">
+                                <div class="flow-fill" id="amuFlow" style="width: 35%"></div>
+                            </div>
+                            <span class="flow-value" id="amuFlowValue">450 m³/s</span>
+                        </div>
+                        <div class="river-stats">
+                            <div class="river-stat">
+                                <span>Yillik oqim:</span>
+                                <strong id="amuYearly">14.2 km³</strong>
+                            </div>
+                            <div class="river-stat">
+                                <span>O'rtacha:</span>
+                                <strong>500-1500 m³/s</strong>
+                            </div>
+                            <div class="river-stat critical">
+                                <span>Hozirgi:</span>
+                                <strong id="amuCurrent">450 m³/s</strong>
+                            </div>
+                            <div class="river-stat decrease">
+                                <span>1960 ga nisbatan:</span>
+                                <strong>-70%</strong>
+                            </div>
+                        </div>
+                        <div class="river-chart">
+                            <canvas id="amuChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Syr Darya -->
+                <div class="river-card syr-darya">
+                    <div class="river-header">
+                        <i class="fas fa-water"></i>
+                        <h3>Sirdaryo</h3>
+                    </div>
+                    <div class="river-content">
+                        <div class="flow-indicator">
+                            <div class="flow-bar">
+                                <div class="flow-fill" id="syrFlow" style="width: 25%"></div>
+                            </div>
+                            <span class="flow-value" id="syrFlowValue">280 m³/s</span>
+                        </div>
+                        <div class="river-stats">
+                            <div class="river-stat">
+                                <span>Yillik oqim:</span>
+                                <strong id="syrYearly">8.8 km³</strong>
+                            </div>
+                            <div class="river-stat">
+                                <span>O'rtacha:</span>
+                                <strong>300-900 m³/s</strong>
+                            </div>
+                            <div class="river-stat critical">
+                                <span>Hozirgi:</span>
+                                <strong id="syrCurrent">280 m³/s</strong>
+                            </div>
+                            <div class="river-stat decrease">
+                                <span>1960 ga nisbatan:</span>
+                                <strong>-65%</strong>
+                            </div>
+                        </div>
+                        <div class="river-chart">
+                            <canvas id="syrChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Data Table -->
+            <div class="daily-data">
+                <h3><i class="fas fa-calendar-day"></i> Kunlik Ma'lumotlar</h3>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Sana</th>
+                                <th>Amudaryo (m³/s)</th>
+                                <th>Sirdaryo (m³/s)</th>
+                                <th>Jami oqim (m³/s)</th>
+                                <th>Tuzlilik (ppt)</th>
+                                <th>O'zgarish</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dailyDataTable">
+                            <!-- JavaScript bilan to'ldiriladi -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GPS Map Section -->
+    <section id="map" class="map-section">
+        <div class="container">
+            <h2 class="section-title">GPS Xarita va Joylashuv</h2>
+            
+            <div class="map-container">
+                <div id="aralMap" class="interactive-map"></div>
+                <div class="map-info">
+                    <div class="info-card">
+                        <h4><i class="fas fa-map-pin"></i> Asosiy Koordinatalar</h4>
+                        <div class="coord-item">
+                            <strong>Mo'ynoq:</strong>
+                            <span>43.75°N, 59.00°E</span>
+                        </div>
+                        <div class="coord-item">
+                            <strong>Shimoliy Orol:</strong>
+                            <span>46.00°N, 61.00°E</span>
+                        </div>
+                        <div class="coord-item">
+                            <strong>Janubiy Orol:</strong>
+                            <span>44.00°N, 58.50°E</span>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <h4><i class="fas fa-satellite"></i> Sensor Joylashuvi</h4>
+                        <div class="sensor-list">
+                            <div class="sensor-item active">
+                                <i class="fas fa-circle"></i>
+                                <span>Sensor #1 - Tuzlilik</span>
+                            </div>
+                            <div class="sensor-item active">
+                                <i class="fas fa-circle"></i>
+                                <span>Sensor #2 - Suv sathi</span>
+                            </div>
+                            <div class="sensor-item active">
+                                <i class="fas fa-circle"></i>
+                                <span>Sensor #3 - Harorat</span>
+                            </div>
+                            <div class="sensor-item">
+                                <i class="fas fa-circle"></i>
+                                <span>Sensor #4 - Oqim</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard -->
+    <section id="dashboard" class="dashboard-section">
+        <div class="container">
+            <h2 class="section-title">Boshqaruv Paneli</h2>
+            
+            <div class="dashboard-grid">
+                <div class="dash-card">
+                    <h3><i class="fas fa-chart-pie"></i> Umumiy Holat</h3>
+                    <div class="status-overview">
+                        <div class="status-item critical">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <div>
+                                <strong>Kritik</strong>
+                                <span>Tuzlilik darajasi</span>
+                            </div>
+                        </div>
+                        <div class="status-item warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div>
+                                <strong>Xavfli</strong>
+                                <span>Suv sathi pasayishi</span>
+                            </div>
+                        </div>
+                        <div class="status-item info">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <strong>Ma'lumot</strong>
+                                <span>Daryo oqimi kam</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dash-card">
+                    <h3><i class="fas fa-tasks"></i> Tavsiyalar</h3>
+                    <ul class="recommendations">
+                        <li><i class="fas fa-check"></i> Amudaryo oqimini oshirish</li>
+                        <li><i class="fas fa-check"></i> Suv tejash texnologiyalari</li>
+                        <li><i class="fas fa-check"></i> Tuzli tuproqni qayta ishlash</li>
+                        <li><i class="fas fa-check"></i> Ekotizimni tiklash</li>
+                    </ul>
+                </div>
+
+                <div class="dash-card">
+                    <h3><i class="fas fa-download"></i> Hisobotlar</h3>
+                    <div class="report-buttons">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-file-pdf"></i> PDF Hisobot
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-file-excel"></i> Excel
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-print"></i> Chop etish
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>AralClean</h4>
+                    <p>Orol dengizini saqlash va tiklash uchun zamonaviy monitoring tizimi.</p>
+                    <p><strong>Loyiha hududi:</strong> Qoraqalpog'iston Respublikasi</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Aloqa</h4>
+                    <p><i class="fas fa-map-marker-alt"></i> Mo'ynoq tumani, Qoraqalpog'iston</p>
+                    <p><i class="fas fa-envelope"></i> info@aralclean.uz</p>
+                    <p><i class="fas fa-phone"></i> +998 61 123 45 67</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Ma'lumotlar</h4>
+                    <p><i class="fas fa-database"></i> Real vaqt rejimi</p>
+                    <p><i class="fas fa-satellite"></i> GPS monitoring</p>
+                    <p><i class="fas fa-flask"></i> Tuzlilik o'lchovi</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 AralClean. Orol dengizini saqlash loyihasi.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script_uz.js"></script>
+</body>
+</html>
